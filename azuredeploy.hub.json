@@ -1,0 +1,80 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {},
+    "parameters": {
+        "vnetSettings": {
+            "type": "object"
+        },
+        "nsgSettings": {
+            "type": "object"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('VNetSettings').name]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[parameters('nsgSettings').name]"
+            ],
+            "tags": {
+                "[parameters('vnetSettings').tags[0].tagName]": "[parameters('vnetSettings').tags[0].tagValue]",
+                "[parameters('vnetSettings').tags[1].tagName]": "[parameters('vnetSettings').tags[1].tagValue]",
+                "[parameters('vnetSettings').tags[2].tagName]": "[parameters('vnetSettings').tags[2].tagValue]",
+                "[parameters('vnetSettings').tags[3].tagName]": "[parameters('vnetSettings').tags[3].tagValue]"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": "[parameters('VNetSettings').addressPrefixes]" 
+                },
+                "dhcpOptions": {
+                    "dnsServers": "[parameters('VNetSettings').dnsServerAddresses]"
+                },
+                "copy": [
+                    {
+                        "name": "subnets",
+                        "count": "[length(parameters('vnetSettings').subnets)]",
+                        "input": {
+                            "name": "[parameters('vnetSettings').subnets[copyIndex('subnets')].name]",
+                            "properties": {
+                                "addressPrefix": "[parameters('vnetSettings').subnets[copyIndex('subnets')].addressPrefix]",
+                                "networkSecurityGroup": "[if(empty(parameters('vnetSettings').subnets[copyIndex('subnets')].nsg), json('null'),  json(concat('{\"id\": \"', resourceId('Microsoft.Network/networkSecurityGroups', parameters('vnetSettings').subnets[copyIndex('subnets')].nsg), '\"}')))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2017-06-01",
+            "name": "[parameters('nsgSettings').name]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "copy": [
+                    {
+                        "name": "securityRules",
+                        "count": "[length(parameters('nsgSettings').securityRules)]",
+                        "input": {
+                            "name": "[parameters('nsgSettings').securityRules[copyIndex('securityRules')].description]",
+                            "properties": {
+                                "description": "[parameters('nsgSettings').securityRules[copyIndex('securityRules')].description]",
+                                "protocol": "[parameters('nsgSettings').securityRules[copyIndex('securityRules')].protocol]",
+                                "sourcePortRange": "[parameters('nsgSettings').securityRules[copyIndex('securityRules')].sourcePortRange]",
+                                "destinationPortRange": "[parameters('nsgSettings').securityRules[copyIndex('securityRules')].destinationPortRange]",
+                                "sourceAddressPrefix": "[parameters('nsgSettings').securityRules[copyIndex('securityRules')].sourceAddressPrefix]",
+                                "destinationAddressPrefix": "[parameters('nsgSettings').securityRules[copyIndex('securityRules')].destinationAddressPrefix]",
+                                "access": "[parameters('nsgSettings').securityRules[copyIndex('securityRules')].access]",
+                                "priority": "[parameters('nsgSettings').securityRules[copyIndex('securityRules')].priority]",
+                                "direction": "[parameters('nsgSettings').securityRules[copyIndex('securityRules')].direction]"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {}
+}

@@ -1,0 +1,44 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "VNetSettings": {
+            "value": {
+                "name": "hub001-dev-uks-net",
+                "tags": [
+                    { "tagName": "description", "tagValue": "hubNetwork" },
+                    { "tagName": "environment", "tagValue": "Lab" },
+                    { "tagName": "owner", "tagValue": "xxx@xxx" },
+                    { "tagName": "role", "tagValue": "core infrastructure" }
+                ],
+                "addressPrefixes": 
+                [ "172.100.0.0/24"  ],
+                "dnsServerAddresses": 
+                [ "x.x.x.x", "x.x.x.x" ],
+                "subnets": [
+                    { "name": "ServicesSubnet",  "addressPrefix": "172.100.0.128/25", "nsg": "hub001-dev-uks-net-svc-nsg" },
+                    { "name": "GatewaySubnet",   "addressPrefix": "172.100.0.0/27", "nsg": "" }
+                ]
+            }
+        },
+        "nsgSettings": {
+            "value": {
+                "name": "hub001-dev-uks-net-svc-nsg",
+                "securityRules": [
+                    {
+                        "name": "BlockOutboundInternet",
+                        "description": "BlockOutboundInternet",
+                        "protocol": "*",
+                        "sourcePortRange": "*",
+                        "destinationPortRange": "*",
+                        "sourceAddressPrefix": "VirtualNetwork",
+                        "destinationAddressPrefix": "Internet",
+                        "access": "Deny",
+                        "priority": 100,
+                        "direction": "Outbound"
+                    }
+                ]
+            }
+        }
+    }
+}
