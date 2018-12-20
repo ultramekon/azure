@@ -1,0 +1,46 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    "vpnType": {
+      "Value": "RouteBased",
+	  "metadata": { "description": "Route based (Dynamic Gateway) or Policy based (Static Gateway)" }
+      },
+    "localGatewayName": {
+      "value": "LocalFirewall",
+      "metadata": { "description": "Name for gateway resource representing your local/on-prem gateway"}
+    },
+    "localGatewayIpAddress": {
+      "value": "x.x.x.x",
+      "metadata": { "description": "Public IP of your local/on-prem gateway" }
+    },
+    "localAddressPrefix": {
+      "value": ["192.168.1.0/24", "192.168.2.0/24", "192.168.3.0/23"],
+      "metadata": { "description": "CIDR block representing the address space of your local/on-prem network's Subnet" }
+    },
+    "virtualNetworkName": {
+      "value": "hub001-dev-uks-net",
+      "metadata": { "description": "Azure Virtual Network" }
+    },
+    "gatewayPublicIPName": {
+      "value": "hub001-dev-uks-net-gw-pip",
+      "metadata": { "description": "Name for public IP resource used for the new azure gateway" }
+    },
+    "gatewayName": {
+      "value": "hub001-dev-uks-net-gw",
+      "metadata": { "description": "Name for the new gateway" }
+    },
+    "gatewaySku": {
+      "value": "VpnGw1",
+      "metadata": { "description": "The Sku of the Gateway" }
+    },
+    "connectionName": {
+      "value": "hub2onprem",
+      "metadata": { "description": "Name for the new connection between Azure VNet and other network" }
+    },
+    "sharedKey": {
+      "value": "superSecret123$",
+      "metadata": { "description": "Shared key (PSK) for IPSec tunnel" }
+    }
+  }
+}
